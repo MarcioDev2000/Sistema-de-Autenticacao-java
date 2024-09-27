@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.gmail.gmail_test.Models.EmailModel;
 import com.example.gmail.gmail_test.dtos.EmailDto;
+import com.example.gmail.gmail_test.enums.StatusEmail;
 import com.example.gmail.gmail_test.services.EmailService;
 
 @Component
@@ -20,6 +21,7 @@ public class EmailConsumer {
     public void listen(@Payload EmailDto emailDto) {
         EmailModel emailModel = new EmailModel();
         BeanUtils.copyProperties(emailDto, emailModel);
+        emailModel.setStatusEmail(StatusEmail.PROCESSING);
         emailService.sendEmail(emailModel);
         System.out.println("Email Status: " + emailModel.getStatusEmail().toString());
     }
