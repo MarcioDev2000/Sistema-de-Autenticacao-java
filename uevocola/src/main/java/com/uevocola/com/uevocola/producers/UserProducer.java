@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.uevocola.com.uevocola.dtos.EmailDto;
+import com.uevocola.com.uevocola.models.TaskModel;
 import com.uevocola.com.uevocola.models.UserModel;
 
 @Component
@@ -22,6 +23,16 @@ public class UserProducer {
         emailDto.setEmailTo(user.getEmail());
         emailDto.setSubject("Bem-vindo ao Uevocola");
         emailDto.setText("Olá " + user.getName() + ",\n\nObrigado por se cadastrar no Uevocola!");
+
+        rabbitTemplate.convertAndSend(queue, emailDto);
+    }
+
+      public void sendTaskCompletionEmail(UserModel user, TaskModel task) {
+        EmailDto emailDto = new EmailDto();
+        emailDto.setUserId(user.getId());
+        emailDto.setEmailTo(user.getEmail());
+        emailDto.setSubject("Sua tarefa '" + task.getTitle() + "' foi concluída");
+        emailDto.setText("Olá " + user.getName() + ",\n\nA tarefa '" + task.getTitle() + "' que você registrou atingiu seu prazo e foi concluída.");
 
         rabbitTemplate.convertAndSend(queue, emailDto);
     }

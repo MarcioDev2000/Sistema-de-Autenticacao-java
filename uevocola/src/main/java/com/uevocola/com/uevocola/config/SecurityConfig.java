@@ -1,5 +1,6 @@
 package com.uevocola.com.uevocola.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,11 +9,21 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.uevocola.com.uevocola.services.YourUserDetailsService;
 
 @Configuration
 public class SecurityConfig {
+
+    private final YourUserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    public SecurityConfig(YourUserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.userDetailsService = userDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -20,9 +31,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users").permitAll() 
+                        .requestMatchers("/tasks").authenticated()
+                        .requestMatchers("/tasks/**").authenticated()
                         .requestMatchers("/auth/login").permitAll() 
-                        .anyRequest().authenticated() // Exigir autenticação para outras requisições
+                        .requestMatchers("/auth/register").permitAll() 
+                        .anyRequest().authenticated()
                 );
+
+        // Adiciona o filtro de autenticação JWT
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -35,16 +52,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         @SuppressWarnings("null")
-        AuthenticationManagerBuilder authenticationManagerBuilder =
+        AuthenticationManagerBuilder authenticationManagerBuilder = 
                 http.getSharedObject(AuthenticationManagerBuilder.class);
 
-        authenticationManagerBuilder.userDetailsService(yourUserDetailsService()).passwordEncoder(passwordEncoder());
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 
         return authenticationManagerBuilder.build();
-    }
-
-    @Bean
-    public YourUserDetailsService yourUserDetailsService() {
-        return new YourUserDetailsService(); 
     }
 }

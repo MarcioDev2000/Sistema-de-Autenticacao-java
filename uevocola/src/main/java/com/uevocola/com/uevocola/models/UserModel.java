@@ -1,5 +1,6 @@
 package com.uevocola.com.uevocola.models;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -17,6 +18,9 @@ public class UserModel implements Serializable {
     
     @NotBlank
     private String name;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TaskModel> tasks;
  
     @NotBlank
     @Email

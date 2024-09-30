@@ -65,5 +65,4 @@ public ResponseEntity<?> loginUser(@RequestBody UserRecordDto userRecordDto) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
     }
 }
-
 }
