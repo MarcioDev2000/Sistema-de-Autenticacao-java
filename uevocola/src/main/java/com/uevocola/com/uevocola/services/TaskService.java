@@ -10,6 +10,7 @@ import com.uevocola.com.uevocola.models.TaskModel;
 import com.uevocola.com.uevocola.models.UserModel;
 import com.uevocola.com.uevocola.repositories.TaskRepository;
 import com.uevocola.com.uevocola.repositories.UserRepository;
+import com.uevocola.com.uevocola.websocket.MyWebSocketHandler;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,9 @@ public class TaskService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired 
+    private MyWebSocketHandler webSocketHandler;
 
     // Método para listar todas as tarefas
     public List<TaskModel> findAll() {
@@ -39,11 +43,12 @@ public class TaskService {
         TaskModel taskModel = new TaskModel();
         taskModel.setTitle(taskRecordDto.title());
         taskModel.setDescription(taskRecordDto.description());
-        taskModel.setStatus(taskRecordDto.status());
-        taskModel.setPriority(taskRecordDto.priority()); // Definindo a prioridade
+        taskModel.setStatus(TaskStatus.PENDING); // Definindo o status padrão
+        taskModel.setPriority(TaskPriority.LOW); // Definindo a prioridade padrão
         taskModel.setStartTime(taskRecordDto.startTime()); // Definindo a data e hora de início
         taskModel.setEndTime(taskRecordDto.endTime()); // Definindo a data e hora de término
         taskModel.setDueDate(taskRecordDto.dueDate());
+
         // Buscar o usuário pelo UUID fornecido
         Optional<UserModel> userOptional = userRepository.findById(taskRecordDto.userId());
         if (userOptional.isPresent()) {
@@ -51,14 +56,14 @@ public class TaskService {
         } else {
             throw new RuntimeException("Usuário não encontrado");
         }
-              // Define o status e Priority por padrão
-         taskModel.setStatus(TaskStatus.PENDING);
-         taskModel.setPriority(TaskPriority.LOW);
 
-        return taskRepository.save(taskModel);
+        TaskModel savedTask = taskRepository.save(taskModel);
+        
+        // Enviar mensagem para os clientes conectados via WebSocket
+        webSocketHandler.sendMessage("Nova tarefa adicionada: " + savedTask.getTitle());
+        
+        return savedTask;
     }
-
-
 
     // Método para atualizar uma tarefa existente
     public Optional<TaskModel> updateTask(UUID id, TaskRecordDto taskRecordDto) {
@@ -72,6 +77,9 @@ public class TaskService {
             taskToUpdate.setEndTime(taskRecordDto.endTime()); // Definindo a data e hora de término
             taskToUpdate.setDueDate(taskRecordDto.dueDate());
             taskRepository.save(taskToUpdate);
+            
+            // Enviar mensagem para os clientes conectados via WebSocket
+            webSocketHandler.sendMessage("Tarefa atualizada: " + taskToUpdate.getTitle());
             return Optional.of(taskToUpdate);
         }
         return Optional.empty(); // Caso a tarefa não seja encontrada
@@ -83,6 +91,8 @@ public class TaskService {
 
         if (taskToDelete.isPresent()) {
             taskRepository.deleteById(id);
+            // Enviar mensagem para os clientes conectados via WebSocket
+            webSocketHandler.sendMessage("Tarefa deletada: " + taskToDelete.get().getTitle());
             return true;
         }
         return false;
