@@ -22,12 +22,12 @@ public class UserController {
     private UserService userService; 
 
     @PostMapping
-  public ResponseEntity<?> saveUser(@RequestBody @Valid UserRecordDto userRecordDto) {
+public ResponseEntity<?> saveUser(@RequestBody @Valid UserRecordDto userRecordDto) {
     try {
         UserModel userModel = userService.saveUser(userRecordDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
     } catch (RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // Retorna a mensagem de erro
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }
 

@@ -28,7 +28,19 @@ public class UserModel implements Serializable {
  
     @NotBlank
     private String password;
- 
+
+    @NotBlank
+    private String sobrenome;
+
+    @NotBlank
+    private String telefone;
+
+    @NotBlank
+    private String nif;
+
+    @NotBlank
+    private String endereco;
+
     public UUID getId() {
         return this.id;
     }
@@ -60,4 +72,38 @@ public class UserModel implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
+
+    public String getSobrenome() {
+        return this.sobrenome;
+    }
+
+    public void setSobrenome(String sobrenome) {
+        this.sobrenome = sobrenome;
+    }
+
+    public String getTelefone() {
+        return this.telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getNif() {
+        return this.nif;
+    }
+
+    public void setNif(String nif) {
+        this.nif = nif;
+    }
+
+    public String getEndereco() {
+        return this.endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
+    }
+
  }

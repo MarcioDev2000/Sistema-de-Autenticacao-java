@@ -36,6 +36,10 @@ public class UserService {
         UserModel userModel = new UserModel();
         userModel.setName(userRecordDto.name());
         userModel.setEmail(userRecordDto.email());
+        userModel.setSobrenome(userRecordDto.sobrenome());
+        userModel.setTelefone(userRecordDto.telefone()); 
+        userModel.setNif(userRecordDto.nif()); 
+        userModel.setEndereco(userRecordDto.endereco());
         userModel.setPassword(passwordEncoder.encode(userRecordDto.password()));
 
         UserModel savedUser = userRepository.save(userModel);
