@@ -41,6 +41,10 @@ public class UserModel implements Serializable {
     @NotBlank
     private String endereco;
 
+    @Column(name = "reset_password_token", nullable = true) // Aqui você pode definir como opcional
+    private String resetPasswordToken;
+
+
     public UUID getId() {
         return this.id;
     }
@@ -104,6 +108,15 @@ public class UserModel implements Serializable {
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
+    }
+
+    
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
     }
 
  }

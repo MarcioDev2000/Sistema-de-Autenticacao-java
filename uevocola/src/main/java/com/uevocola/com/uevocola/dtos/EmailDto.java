@@ -7,6 +7,7 @@ public class EmailDto {
     private String emailTo;
     private String subject;
     private String text;
+    private boolean isHtml;
 
     public UUID getUserId() {
         return userId;
@@ -38,5 +39,13 @@ public class EmailDto {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public boolean isHtml() { 
+        return isHtml;
+    }
+
+    public void setHtml(boolean isHtml) { 
+        this.isHtml = isHtml;
     }
 }

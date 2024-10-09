@@ -26,12 +26,8 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users").permitAll() 
-                        .requestMatchers("/tasks").authenticated()
-                        .requestMatchers("/tasks/**").authenticated()
-                        .requestMatchers("/auth/login").permitAll() 
-                        .requestMatchers("/auth/register").permitAll() 
-                        .anyRequest().authenticated()
+                .anyRequest().permitAll()
+                     
                 );
 
         // Adiciona o filtro de autenticação JWT

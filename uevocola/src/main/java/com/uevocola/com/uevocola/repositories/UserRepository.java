@@ -9,4 +9,7 @@ import com.uevocola.com.uevocola.models.UserModel;
 @Repository
 public interface UserRepository extends JpaRepository<UserModel, UUID> {
     Optional<UserModel> findByEmail(String email);
+    Optional<UserModel> findByResetPasswordToken(String resetPasswordToken);
+
+
 }

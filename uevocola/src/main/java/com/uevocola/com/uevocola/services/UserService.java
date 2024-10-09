@@ -3,13 +3,13 @@ package com.uevocola.com.uevocola.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.uevocola.com.uevocola.config.JwtUtil;
 import com.uevocola.com.uevocola.dtos.UserRecordDto;
 import com.uevocola.com.uevocola.models.UserModel;
-import com.uevocola.com.uevocola.producers.UserProducer;
+import com.uevocola.com.uevocola.producers.UserProducer; // Verifique esta importação
 import com.uevocola.com.uevocola.repositories.UserRepository;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,10 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserProducer userProducer;
+    private UserProducer userProducer; // Verifique se a importação está correta
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Transactional
     public UserModel saveUser(UserRecordDto userRecordDto) {
@@ -84,4 +87,39 @@ public class UserService {
     public void deleteUser(UUID id) {
         userRepository.deleteById(id);
     }
+
+    @Transactional
+public void forgotPassword(String email) {
+    // Encontra o usuário pelo email
+    UserModel userModel = userRepository.findByEmail(email).orElseThrow(
+        () -> new RuntimeException("Usuário não encontrado com este email.")
+    );
+
+    // Gera o token de redefinição de senha
+    String resetPasswordToken = jwtUtil.generateResetPasswordToken(email);
+    userModel.setResetPasswordToken(resetPasswordToken);
+
+    // Salva o usuário com o token
+    userRepository.save(userModel); // Aqui é onde o commit acontece no banco
+
+    // Envia o e-mail com o link de redefinição
+    String resetLink = "http://localhost:8082/reset-password?token=" + resetPasswordToken;
+    userProducer.sendResetPasswordEmail(userModel.getEmail(), resetLink);
+}
+
+    
+
+    @Transactional
+public void resetPassword(String token, String newPassword) {
+    // Encontra o usuário pelo token
+    UserModel user = userRepository.findByResetPasswordToken(token)
+            .orElseThrow(() -> new RuntimeException("Token inválido ou expirado"));
+
+    // Atualiza a senha do usuário
+    user.setPassword(passwordEncoder.encode(newPassword)); // Criptografa a nova senha
+    user.setResetPasswordToken(null); // Limpa o token após a redefinição
+    userRepository.save(user); // Salva o usuário com a nova senha e o token limpo
+}
+
+    
 }

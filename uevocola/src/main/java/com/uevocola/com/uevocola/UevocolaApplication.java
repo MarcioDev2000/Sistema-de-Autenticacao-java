@@ -10,5 +10,5 @@ public class UevocolaApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(UevocolaApplication.class, args);
 	}
-
+	
 }

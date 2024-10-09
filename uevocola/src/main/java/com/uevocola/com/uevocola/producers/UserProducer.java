@@ -1,4 +1,5 @@
 package com.uevocola.com.uevocola.producers;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,7 @@ public class UserProducer {
         rabbitTemplate.convertAndSend(queue, emailDto);
     }
 
-      public void sendTaskCompletionEmail(UserModel user, TaskModel task) {
+    public void sendTaskCompletionEmail(UserModel user, TaskModel task) {
         EmailDto emailDto = new EmailDto();
         emailDto.setUserId(user.getId());
         emailDto.setEmailTo(user.getEmail());
@@ -36,5 +37,13 @@ public class UserProducer {
 
         rabbitTemplate.convertAndSend(queue, emailDto);
     }
-}
 
+    public void sendResetPasswordEmail(String email, String recoveryLink) {
+        EmailDto emailDto = new EmailDto();
+        emailDto.setEmailTo(email);
+        emailDto.setSubject("Recuperação de Senha");
+        emailDto.setText("Olá,\n\nVocê solicitou a recuperação da sua senha. Acesse o link para redefinir sua senha: " + recoveryLink);
+
+        rabbitTemplate.convertAndSend(queue, emailDto);
+    }
+}
